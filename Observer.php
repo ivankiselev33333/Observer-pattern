@@ -1,48 +1,98 @@
 <?php
+<?php
 
-// Задача по гет...
-class Person{
-    public function __get($value){
+Class Newspaper_kiosk
+{
+    private $list_of_humans;
+    private $list_of_newspapers;
 
-            echo "Произошло обращение к свойству <br />";
-            return $this->value=$value;
-
-
-}
-public function __set($name,$str){
-    $str=strtolower($str);
-    $str=ucwords($str);
-    return $this->name=$str;
-}
-    public function __isset($name) {
-        if ($name == 'area') {
-            return true;
-        }
-        return false;
+    public function __construct()
+    {
+        $this->list_of_humans = [];
+        $this->list_of_newspapers = ['Цивилизация', 'Жизнь и труд', 'Иерархия закономерностей'];
     }
-    public function __unset($name) {
-        if ($name == 'area') {
-            $this->$name = null;
+
+    public function get_newspapper($name_newspapper)
+    {
+        if (in_array($name_newspapper, $this->list_of_newspapers)) {
+            print_r('<br>' . $name_newspapper . ' уже есть' . '<br>');
+        } else {
+            $this->list_of_newspapers[] = $name_newspapper;
+            print_r('<br>' . $name_newspapper . ' поступила в продажу' . '<br>');
+            $this->deliver_to_humans($this->list_of_humans, $name_newspapper);
         }
     }
 
-    public function __invoke(){
-        echo 'invoke fired';
+    public function deliver_to_humans($list_of_humans, $name_newspapper)
+    {
+        foreach ($list_of_humans as $person) {
+            $person->get_newspapper($name_newspapper);
+        }
+    }
+
+    public function register_human($human)
+    {
+        if (in_array($human, $this->list_of_humans)) {
+            print_r('<br>' . $human->askname() . ' уже был подписан' . '<br>');
+        } else {
+            $this->list_of_humans[] = $human;
+            print_r('<br>' . 'Спасибо что подписался ' . $human->askname() . '<br>');
+        }
+    }
+
+    public function remove_human($human)
+    {
+        if (in_array($human, $this->list_of_humans)) {
+            $index_human_in_array = array_search($human, $this->list_of_humans);
+            unset($this->list_of_humans[$index_human_in_array]);
+            echo $human->askname() . ' Больше не получает подписку <br>';
+        } else {
+            echo $human->askname() . '  не получал подписку <br>';
+        }
+    }
+
+    public function show_newspappers()
+    {
+        foreach ($this->list_of_newspapers as $n) {
+            echo $n . '<br>';
+        }
     }
 }
 
-$p=new person;
+Class Human
+{
+    private $name;
 
-$p->name='john';
-print_r($p);
+    public function __construct($name)
+    {
+        $this->name = $name;
+    }
+
+    public function get_newspapper($name_newspapper)
+    {
+        echo $this->askname() . 'получил новую газету ' . $name_newspapper;
+    }
+
+    public function askname()
+    {
+        echo '<br>My name is ' . $this->name . '<br>';
+    }
+}
+
+$kiosk = new Newspaper_kiosk();
+$kiosk->show_newspappers();
+$dima = new Human('Dima');
+$ivan = new Human('Ivan');
+$dima->askname();
+$ivan->askname();
+$kiosk->register_human($dima);
+$kiosk->register_human($dima);
+$kiosk->register_human($ivan);
+$kiosk->get_newspapper('Правда');
+$kiosk->get_newspapper('Наука и мир');
+$kiosk->get_newspapper('Полет на марс');
+$kiosk->remove_human($dima);
+$kiosk->get_newspapper('something');
 
 
-var_dump(isset($p->name)); //  bool(true)
-var_dump(isset($p->area)); //  bool(true)
-$p->area='test';
-print_r($p);
-unset($p->area);
-var_dump($p); // float(0)
-
-//зачем? наверника для случаев когда нужно проверить присвоенные свойства объекту...
 ?>
